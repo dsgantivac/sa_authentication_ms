@@ -1,0 +1,7 @@
+sudo pip3 install mysql-connector
+sudo pip3 install python-ldap
+
+
+sudo apt-get update
+sudo apt-get install mysql-server
+sudo mysql_secure_installation

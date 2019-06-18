@@ -1,0 +1,246 @@
+#Test with: http://editor.swagger.io/
+
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: Microservice for Authentication
+  description: Flask + Sqlite3
+  license:
+    name: Software Architecture, 2019-I
+host: 192.168.99.101:5005
+basePath: /
+schemes:
+  - http
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /Users:
+    post:
+      summary: Creates a new user and gets user token
+      operationId: createUser
+      parameters:
+        - name: User
+          in: body
+          required: true
+          description: create system user
+          schema:
+            $ref: '#/definitions/UserInput'
+      responses:
+        '201':
+          description: UserCreated
+          schema:
+            $ref: '#/definitions/UserCreated'
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+    put:
+      summary: Update username
+      operationId: updateUser
+      parameters:
+        - name: Update
+          in: body
+          required: true
+          description: system user update
+          schema:
+            $ref: '#/definitions/UserUpdate'
+      responses:
+        '200':
+          description: Ok
+          schema:
+            $ref: '#/definitions/CorrectModel'
+        '406':
+          description: Not Acceptable (Invalid Params)
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+    
+    delete:
+      summary: Delete a course with his email
+      operationId: deleteUser
+      parameters:
+        - name: Delete
+          in: body
+          required: true
+          description: delete user from system
+          schema:
+            $ref: '#/definitions/UserDelete'
+      responses:
+        '200':
+          description: Ok
+          schema:
+            $ref: '#/definitions/CorrectModel'
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '406':
+            description: Not Acceptable (Invalid Params)
+            schema:
+              $ref: '#/definitions/ErrorModel'
+        '500':
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+
+    
+  /Session:    
+    post:
+      summary: Create a user session
+      operationId: sessionUser
+      parameters:
+        - name: Start
+          in: body
+          required: true
+          description: create new user token form session
+          schema:
+            $ref: '#/definitions/StartSession'
+      responses:
+        '200':
+          description: Ok
+          schema:
+            $ref: '#/definitions/SessionCreate'
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '406':
+            description: Not Acceptable (Invalid Params)
+            schema:
+              $ref: '#/definitions/ErrorModel'
+        '500':
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+
+    
+  /validateToken:
+    post:
+      summary: verify token
+      operationId: validateToken
+      parameters:
+        - name: Start
+          in: body
+          required: true
+          description: verify user token session
+          schema:
+            $ref: '#/definitions/TokenSession'
+      responses:
+        '200':
+          description: Ok
+          schema:
+            $ref: '#/definitions/CorrectModel'
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '406':
+            description: Not Acceptable (Invalid Params)
+            schema:
+              $ref: '#/definitions/ErrorModel'
+        '500':
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+
+    
+
+definitions:
+
+
+  UserInput:
+    type: object
+    properties:
+      name:
+        type: string
+      email:
+        type: string
+      password:
+        type: string
+    
+      
+  UserUpdate:
+    type: object
+    properties:
+      id:
+        type: integer
+      new_name:
+        type: string
+  
+  UserCreated:
+    type: object
+    properties:
+      id:
+        type: integer
+      advise:
+        type: string
+      token:
+        type: string
+  
+
+  UserDelete:
+    type: object
+    properties:
+      email:
+        type: string
+  
+  StartSession:
+    type: object
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      
+  
+  CorrectModel:
+    type: object
+    required:
+      - message
+      - code
+    properties:
+      advice:
+        type: string
+        
+  SessionCreate:
+    type: object
+    required:
+      - message
+      - code
+    properties:
+      advice:
+        type: string
+      token:
+        type: string
+  
+  TokenSession:
+    type: object
+    required:
+      - message
+      - code
+    properties:
+      email:
+        type: string
+      token:
+        type: string
+  
+
+# Errors
+  ErrorModel:
+    type: object
+    required:
+      - message
+      - code
+    properties:
+      advice:
+        type: string
+      

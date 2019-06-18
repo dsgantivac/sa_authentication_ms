@@ -1,0 +1,62 @@
+version: '2.1'
+
+services:
+  users-ms:
+    container_name: users-ms
+    build: .
+    command: python3 app.py
+    links:
+      - db
+    ports:
+      - "5005:5005"
+    depends_on:
+      - db
+
+  db:
+    image: mysql:5.7
+    container_name: users-db
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'db'
+      # So you don't have to use root, but you can if you like
+      MYSQL_USER: 'user'
+      # You can use whatever password you like
+      MYSQL_PASSWORD: 'password'
+      # Password for root access
+      MYSQL_ROOT_PASSWORD: 'password'
+    ports:
+      # <Port exposed> : < MySQL Port running inside container>
+      - '3307:3306'
+    expose:
+      # Opens port 3306 on the container
+      - '3307'
+      # Where our data will be persisted
+    volumes:
+      - my-db:/var/lib/mysql
+# Names our volume
+volumes:
+  my-db:
+
+
+
+
+
+#version: '2'
+#services:
+#  web:
+#    build: .
+#    command: python3 app.py
+#    ports:
+#     - "5000:5000"
+#    volumes:
+#     - .:/code
+#  mysql:
+#    image: mysql/mysql-server
+#    environment:
+#      MYSQL_DATABASE: test
+#      MYSQL_ROOT_PASSWORD: root
+#      MYSQL_ROOT_HOST: 0.0.0.0
+#      MYSQL_USER: testing
+#      MYSQL_PASSWORD: testing
+#    ports:
+#      - "3306:3306"

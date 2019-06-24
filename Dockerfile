@@ -8,5 +8,3 @@ RUN pip3 install python-ldap
 COPY . /app
 
 WORKDIR /app
-
-EXPOSE 5005

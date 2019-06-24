@@ -53,12 +53,13 @@ def createUser():
     name = content['name']
     email = content['email']
     password = content['password']
+    mobil = content['mobil']
     isValid = databaseFn.validateEmail(cursor,email)
     isValid2 =  databaseFn.validateName(cursor,name)
-    print("VALIDATION",isValid,isValid2)
+    #print("VALIDATION",isValid,isValid2)
     if isValid and isValid2:
         data = databaseFn.newUser(db,cursor,name,email,password)
-        data = databaseFn.generateToken(db,cursor,data["id"],email)
+        data = databaseFn.generateToken(db,cursor,data["id"],email,mobil)
         return jsonify(data)
     elif not isValid2:
         return jsonify({"error": "el nombre ya existe"})
@@ -88,13 +89,11 @@ def deleteUser():
 #Token validation
 @app.route('/validateToken', methods = ['POST'])
 def validateToken():
-    #content = request.get_json()
-    #email = content['email']
-    #token = content['token']
     email = request.headers.get("email")
     token = request.headers.get("token")
-    data = databaseFn.validateToken(cursor,email,token)
-    isUpdated = databaseFn.updateExpiration(cursor,email)
+    mobil = request.headers.get("mobil")
+    data = databaseFn.validateToken(cursor,email,token,mobil)
+    isUpdated = databaseFn.updateExpiration(cursor,email,mobil)
     if isUpdated:
         data["isUpdated"] = isUpdated
     else:
@@ -114,9 +113,10 @@ def sessionStart():
     content = request.get_json()
     email = content['email']
     password = content['password']
+    mobil = content['mobil']
     flag = databaseFn.validateUser(cursor,email,password)
     if flag:
-        data = databaseFn.updateToken(cursor,email)
+        data = databaseFn.updateToken(cursor,email,mobil)
         return jsonify(data)
     else:
         return jsonify({"advise":"bad email or password "})
@@ -125,7 +125,8 @@ def sessionStart():
 def sessionDelete():
     content = request.get_json()
     email = content['email']
-    isExpired = databaseFn.expireToken(cursor,email)
+    mobil = content['mobil']
+    isExpired = databaseFn.expireToken(cursor,email,mobil)
     if isExpired:
         return jsonify({"advise":"token expirado mi prro"})
     else:
@@ -142,9 +143,8 @@ def ldapAuth():
 
     try:
         ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT,0)
-        #con = ldap.initialize("ldap://192.168.99.101:389")
+	#con = ldap.initialize("ldap://192.168.99.101:389")
 	con = ldap.initialize("ldap://undrive-ldap:389")
-
         con.set_option(ldap.OPT_PROTOCOL_VERSION, 3)
         user_dn = "cn="+email+",dc=arqsoft,dc=unal,dc=edu,dc=co"
         user_password = password
@@ -175,4 +175,5 @@ def ldapAuth():
 
 if __name__ == "__main__":
     app.run(debug=True,host='0.0.0.0',port = 5005)
+
 

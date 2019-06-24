@@ -27,8 +27,10 @@ def createDB(cursor):
     sql = """CREATE TABLE IF NOT EXISTS tokens (
         id INT(11) PRIMARY KEY,
         email VARCHAR(60) NOT NULL,
-        token VARCHAR(60) NOT NULL,
-        date VARCHAR(60) NOT NULL
+        token VARCHAR(60) DEFAULT "",
+        tokenMobil VARCHAR(60) DEFAULT "",
+        date VARCHAR(60) DEFAULT "2019-01-01 00-00-00",
+        dateMobil VARCHAR(60) DEFAULT "2019-01-01 00-00-00"
         ); """
     cursor.execute(sql)
 
@@ -141,12 +143,15 @@ def deleteUser(db,cursor,email):
         db.rollback()
         return {"advise":"error on insert"}
 
-def generateToken(db,cursor,id,email):
+def generateToken(db,cursor,id,email,mobil):
     now = time.strftime('%Y-%m-%d %H-%M-%S')
     print(now)
     token = randomString()
-    sql = "insert into tokens(id,email,token,date) values (\""+str(id)+"\",\""+email+"\",\""+token+"\",\""+str(now)+"\");"
-    print(sql)
+    if mobil == "true":
+        sql = "insert into tokens(id,email,tokenMobil,dateMobil) values (\""+str(id)+"\",\""+email+"\",\""+token+"\",\""+str(now)+"\");"
+    else:
+        sql = "insert into tokens(id,email,token,date) values (\""+str(id)+"\",\""+email+"\",\""+token+"\",\""+str(now)+"\");"
+    #print(sql)
     try:
         # Execute the SQL command
         cursor.execute(sql)
@@ -158,8 +163,13 @@ def generateToken(db,cursor,id,email):
         db.rollback()
         return {"advise":"error on insert"}
 
-def validateToken(cursor,email,token):
-    query = "select token,date from tokens where email like \""+ email+"\""
+def validateToken(cursor,email,token,mobil):
+
+    if mobil =="true":
+        query = "select tokenMobil,date from tokens where email like \""+ email+"\""
+    else:
+        query = "select token,date from tokens where email like \""+ email+"\""
+
     now = time.strftime('%Y-%m-%d %H-%M-%S')
     data = {}
     try:
@@ -189,6 +199,26 @@ def validateToken(cursor,email,token):
 #    return {"token":query_token,"date":d1,"now":d2,"between":time_between(d1,d2)}
     return data
 
+def updateExpiration(cursor,email,mobil):
+    data = {}
+    token = randomString()
+    now = time.strftime('%Y-%m-%d %H-%M-%S')
+    if mobil =="true":
+        query = "update tokens set dateMobil = \""+str(now)+"\" where TRIM(email) LIKE \""+email+"\";"
+    else:
+        query = "update tokens set date = \""+str(now)+"\" where TRIM(email) LIKE \""+email+"\";"
+    # Execute the SQL command
+    try:
+        cursor.execute(query)
+        #data = {"advise":"token updated","token":token,"email":email,"name":name}
+        return True
+    except:
+        data["advise"] = "No se pudieron obtener los datos"
+        print(data)
+        return False
+
+
+
 def getTokens(cursor):
     query = "select * from tokens"
     data = {}
@@ -201,9 +231,11 @@ def getTokens(cursor):
             user_id = row[0]
             email = row[1]
             token = row[2]
-            date = row[3]
+            tokenMobil = row[3]
+            date = row[4]
+            dateMobil = row[5]
             # Now print fetched result
-            data[user_id] = {"id:":user_id,"email:": email, "token:":token,"date":date}
+            data[user_id] = {"id:":user_id,"email:": email, "token:":token,"tokenMobil":tokenMobil,"date":date,"dateMobil":dateMobil}
             #print("id:",user_id,"name:",name,"email:", email, "password:",password )
     except:
         data["advise"] = "No se pudieron obtener los datos"
@@ -211,11 +243,14 @@ def getTokens(cursor):
     return data
 
 
-def updateToken(cursor,email):
+def updateToken(cursor,email,mobil):
     data = {}
     token = randomString()
     now = time.strftime('%Y-%m-%d %H-%M-%S')
-    query = "update tokens set token = \""+token+"\" , date = \""+str(now)+"\" where TRIM(email) LIKE \""+email+"\";"
+    if mobil == "true":
+        query = "update tokens set tokenMobil = \""+token+"\" , dateMobil = \""+str(now)+"\" where TRIM(email) LIKE \""+email+"\";"
+    else:
+        query = "update tokens set token = \""+token+"\" , date = \""+str(now)+"\" where TRIM(email) LIKE \""+email+"\";"
     query2 = "select name from users where email LIKE \""+ email+"\";"
     print(query)
     # Execute the SQL command
@@ -233,26 +268,17 @@ def updateToken(cursor,email):
         print(data)
         return data
 
-def updateExpiration(cursor,email):
-    data = {}
-    token = randomString()
-    now = time.strftime('%Y-%m-%d %H-%M-%S')
-    query = "update tokens set date = \""+str(now)+"\" where TRIM(email) LIKE \""+email+"\";"
-    # Execute the SQL command
-    try:
-        cursor.execute(query)
-        #data = {"advise":"token updated","token":token,"email":email,"name":name}
-        return True
-    except:
-        data["advise"] = "No se pudieron obtener los datos"
-        print(data)
-        return False
 
-def expireToken(cursor,email):
+
+def expireToken(cursor,email,mobil):
     data = {}
     init_data = datetime.strptime("2019-01-01 00-00-00", '%Y-%m-%d %H-%M-%S')
 
-    query = "update tokens set date = \""+str(init_data)+"\" where TRIM(email) LIKE \""+email+"\";"
+    if mobil =="true":
+        query = "update tokens set dateMobil = \""+str(init_data)+"\" where TRIM(email) LIKE \""+email+"\";"
+    else:
+        query = "update tokens set date = \""+str(init_data)+"\" where TRIM(email) LIKE \""+email+"\";"
+
     # Execute the SQL command
     try:
         cursor.execute(query)

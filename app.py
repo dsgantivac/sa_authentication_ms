@@ -142,8 +142,8 @@ def ldapAuth():
 
     try:
         ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT,0)
-        con = ldap.initialize("ldap://192.168.99.101:389")
-	#con = ldap.initialize("ldap://undrive-ldap:389")
+        #con = ldap.initialize("ldap://192.168.99.101:389")
+	con = ldap.initialize("ldap://undrive-ldap:389")
 
         con.set_option(ldap.OPT_PROTOCOL_VERSION, 3)
         user_dn = "cn="+email+",dc=arqsoft,dc=unal,dc=edu,dc=co"

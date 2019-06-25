@@ -11,6 +11,8 @@ import time
 import ldap
 
 app = Flask(__name__)
+#ldapAdress = "ldap://192.168.99.101:389"
+ldapAdress = "ldap://undrive-ldap:389"
 
 #def getMysqlConnection():
 
@@ -113,13 +115,18 @@ def sessionStart():
     content = request.get_json()
     email = content['email']
     password = content['password']
+    ldapAns = ldapAuthConn(email,password)
+    if ldapAns != "true":
+        return jsonify({"advise":ldapAns})
+
     mobil = content['mobil']
     flag = databaseFn.validateUser(cursor,email,password)
     if flag:
         data = databaseFn.updateToken(cursor,email,mobil)
+        data["ldap"] = ldapAns
         return jsonify(data)
     else:
-        return jsonify({"advise":"bad email or password "})
+        return jsonify({"advise":"bad email or password"})
 
 @app.route('/Session', methods = ['DELETE'])
 def sessionDelete():
@@ -143,8 +150,7 @@ def ldapAuth():
 
     try:
         ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT,0)
-        #con = ldap.initialize("ldap://192.168.99.101:389")
-        con = ldap.initialize("ldap://undrive-ldap:389")
+        con = ldap.initialize(ldapAdress)
         con.set_option(ldap.OPT_PROTOCOL_VERSION, 3)
         user_dn = "cn="+email+",dc=arqsoft,dc=unal,dc=edu,dc=co"
         user_password = password
@@ -169,6 +175,24 @@ def ldapAuth():
         return jsonify({"advise":"invalid credentials"})
     except ldap.SERVER_DOWN:
         return jsonify({"advise":"Server down"})
+
+def ldapAuthConn(user_email,user_password):
+    email = user_email
+    password = user_password
+
+    try:
+        ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT,0)
+        con = ldap.initialize(ldapAdress)
+        con.set_option(ldap.OPT_PROTOCOL_VERSION, 3)
+        user_dn = "cn="+email+",dc=arqsoft,dc=unal,dc=edu,dc=co"
+        user_password = password
+        con.simple_bind_s(user_dn,user_password)
+
+        return "true"
+    except ldap.INVALID_CREDENTIALS:
+        return "invalid credentials on ldap"
+    except ldap.SERVER_DOWN:
+        return "Ldap server down"
 
 
 

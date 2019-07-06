@@ -21,16 +21,16 @@ databaseConnectionStatus = "is connected"
 #db = mysql.connector.connect(user='gantiva', host='0.0.0.0', password='12345678', database='users')
 def getMysqlConnection():
     #usersDB
-    db = mysql.connector.connect(user='root', host='users-db', port='3307', password='password', database='db')
+    db = mysql.connector.connect(user='root', host='users-db', password='password', database='users')
     #db =  mysql.connector.connect(user='gantiva', host='0.0.0.0', password='12345678', database='users')
     return db
 
-try:
-    db = getMysqlConnection()
-    cursor = db.cursor()
-    databaseFn.createDB(cursor)
-except:
-    databaseConnectionStatus = "is not connected sorry :'v"
+#try:
+db = getMysqlConnection()
+cursor = db.cursor()
+databaseFn.createDB(cursor)
+#except:
+#    databaseConnectionStatus = "is not connected sorry :'v"
 
 
 @app.route("/")

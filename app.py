@@ -14,6 +14,8 @@ app = Flask(__name__)
 #ldapAdress = "ldap://192.168.99.101:389"
 ldapAdress = "ldap://undrive-ldap:389"
 
+databaseConnectionStatus = "is connected"
+
 #def getMysqlConnection():
 
 #db = mysql.connector.connect(user='gantiva', host='0.0.0.0', password='12345678', database='users')
@@ -23,16 +25,18 @@ def getMysqlConnection():
     #db =  mysql.connector.connect(user='gantiva', host='0.0.0.0', password='12345678', database='users')
     return db
 
-db = getMysqlConnection()
-cursor = db.cursor()
-
-databaseFn.createDB(cursor)
+try:
+    db = getMysqlConnection()
+    cursor = db.cursor()
+    databaseFn.createDB(cursor)
+except:
+    databaseConnectionStatus = "is not connected sorry :'v"
 
 
 @app.route("/")
 def hello():
     output_json = "Esta funcando"
-    return output_json
+    return databaseConnectionStatus
 
 #GET REQUEST
 @app.route('/Users')

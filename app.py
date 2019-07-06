@@ -19,7 +19,7 @@ ldapAdress = "ldap://undrive-ldap:389"
 #db = mysql.connector.connect(user='gantiva', host='0.0.0.0', password='12345678', database='users')
 def getMysqlConnection():
     #usersDB
-    db = mysql.connector.connect(user='root', host='192.168.99.101', port='3307', password='password', database='db')
+    db = mysql.connector.connect(user='root', host='users-db', port='3307', password='password', database='db')
     #db =  mysql.connector.connect(user='gantiva', host='0.0.0.0', password='12345678', database='users')
     return db
 

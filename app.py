@@ -21,7 +21,7 @@ databaseConnectionStatus = "is connected"
 #db = mysql.connector.connect(user='gantiva', host='0.0.0.0', password='12345678', database='users')
 def getMysqlConnection():
     #usersDB
-    db = mysql.connector.connect(user='root', host='authentication-database-lb', password='password', database='users')
+    db = mysql.connector.connect(user='root', host='users-db', password='password', database='users')
     #db =  mysql.connector.connect(user='gantiva', host='0.0.0.0', password='12345678', database='users')
     return db
 

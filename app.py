@@ -170,8 +170,8 @@ def sessionStart():
     if flag:
         data = databaseFn.updateToken(cursor,email,mobil)
         data["ldap"] = ldapAns
-        db.close()
-        cursor.close()
+        #db.close()
+        #cursor.close()
         return jsonify(data)
     else:
         db.close()

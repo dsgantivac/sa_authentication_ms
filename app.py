@@ -29,48 +29,48 @@ def getMysqlConnection():
 db = getMysqlConnection()
 cursor = db.cursor()
 databaseFn.createDB(cursor)
-db.close()
-cursor.close()
+#db.close()
+#cursor.close()
 #except:
 #    databaseConnectionStatus = "is not connected sorry :'v"
 
 
 @app.route("/")
 def hello():
-    db = getMysqlConnection()
-    cursor = db.cursor()
+    #db = getMysqlConnection()
+    #cursor = db.cursor()
     output_json = "Esta funcando"
-    db.close()
-    cursor.close()
+    #db.close()
+    #cursor.close()
     return databaseConnectionStatus
 
 #GET REQUEST
 @app.route('/Users')
 def getUsers():
-        db = getMysqlConnection()
-        cursor = db.cursor()
+        #db = getMysqlConnection()
+        #cursor = db.cursor()
         query = "select *from users "
         data = databaseFn.getUsers(cursor,query)
-        db.close()
-        cursor.close()
+        #db.close()
+        #cursor.close()
         return jsonify(data)
 
 @app.route('/Users/<int:user_id>')
 def getUser(user_id):
-    db = getMysqlConnection()
-    cursor = db.cursor()
+    #db = getMysqlConnection()
+    #cursor = db.cursor()
     query = "select *from users where user_id = "+str(user_id)
     data = databaseFn.getUsers(cursor,query)
     
-    db.close()
-    cursor.close()
+    #db.close()
+    #cursor.close()
     return jsonify(data)
 
 #POST REQUEST
 @app.route('/Users', methods = ['POST'])
 def createUser():
-    db = getMysqlConnection()
-    cursor = db.cursor()
+    #db = getMysqlConnection()
+    #cursor = db.cursor()
 
     content = request.get_json()
     name = content['name']
@@ -83,50 +83,50 @@ def createUser():
     if isValid and isValid2:
         data = databaseFn.newUser(db,cursor,name,email,password)
         data = databaseFn.generateToken(db,cursor,data["id"],email,mobil)
-        db.close()
-        cursor.close()
+        #db.close()
+        #cursor.close()
         return jsonify(data)
     elif not isValid2:
-        db.close()
-        cursor.close()
+        #db.close()
+        #cursor.close()
         return jsonify({"error": "el nombre ya existe"})
     else:
-        db.close()
-        cursor.close()
+        #db.close()
+        #cursor.close()
         return jsonify({"error": "el correo ya existe"})
 
 
 #UPDATE REQUEST
 @app.route('/Users', methods = ['PUT'])
 def updateUser():
-    db = getMysqlConnection()
-    cursor = db.cursor()
+    #db = getMysqlConnection()
+    #cursor = db.cursor()
     content = request.get_json()
     user_id = content['id']
     new_name = content['new_name']
     data = databaseFn.updateUser(db,cursor,user_id,new_name)
-    db.close()
-    cursor.close()
+    #db.close()
+    #cursor.close()
     return jsonify(data)
 
 #DELETE REQUEST
 @app.route('/Users', methods = ['DELETE'])
 def deleteUser():
-    db = getMysqlConnection()
-    cursor = db.cursor()
+    #db = getMysqlConnection()
+    #cursor = db.cursor()
     content = request.get_json()
     email = content['email']
     data = databaseFn.deleteUser(db,cursor,email)
-    db.close()
-    cursor.close()
+    #db.close()
+    #cursor.close()
     return jsonify(data)
 
 
 #Token validation
 @app.route('/validateToken', methods = ['POST'])
 def validateToken():
-    db = getMysqlConnection()
-    cursor = db.cursor()
+    #db = getMysqlConnection()
+    #cursor = db.cursor()
     email = request.headers.get("email")
     token = request.headers.get("token")
     mobil = request.headers.get("mobil")
@@ -136,26 +136,26 @@ def validateToken():
         data["isUpdated"] = isUpdated
     else:
         data["isUpdated"] = isUpdated
-    db.close()
-    cursor.close()
+    #db.close()
+    #cursor.close()
     return jsonify(data)
 
 #get tokens
 @app.route('/Tokens', methods = ['GET'])
 def getTokens():
-    db = getMysqlConnection()
-    cursor = db.cursor()
+    #db = getMysqlConnection()
+    #cursor = db.cursor()
     data = databaseFn.getTokens(cursor)
-    db.close()
-    cursor.close()
+    #db.close()
+    #cursor.close()
     return jsonify(data)
 
 
 #Session start
 @app.route('/Session', methods = ['POST'])
 def sessionStart():
-    db = getMysqlConnection()
-    cursor = db.cursor()
+    #db = getMysqlConnection()
+    #cursor = db.cursor()
     content = request.get_json()
     email = content['email']
     password = content['password']
@@ -180,19 +180,19 @@ def sessionStart():
 
 @app.route('/Session', methods = ['DELETE'])
 def sessionDelete():
-    db = getMysqlConnection()
-    cursor = db.cursor()
+    #db = getMysqlConnection()
+    #cursor = db.cursor()
     content = request.get_json()
     email = content['email']
     mobil = content['mobil']
     isExpired = databaseFn.expireToken(cursor,email,mobil)
     if isExpired:
-        db.close()
-        cursor.close()
+        #db.close()
+        #cursor.close()
         return jsonify({"advise":"token expirado mi prro"})
     else:
-        db.close()
-        cursor.close()
+        #db.close()
+        #cursor.close()
         return jsonify({"advise":"token no expirado mi prro"})
 
 
@@ -200,8 +200,8 @@ def sessionDelete():
 
 @app.route('/ldap',methods = ['POST'])
 def ldapAuth():
-    db = getMysqlConnection()
-    cursor = db.cursor()
+    #db = getMysqlConnection()
+    #cursor = db.cursor()
     content = request.get_json()
     email = content['email']
     password = content['password']
@@ -227,21 +227,21 @@ def ldapAuth():
         https://stackoverflow.com/questions/16051839/how-to-set-lockouttime-and-password-of-a-user-of-active-directory
         https://www.adimian.com/blog/2014/10/basic-ldap-actions-using-python/
         """
-        db.close()
-        cursor.close()
+        #db.close()
+        #cursor.close()
         return jsonify({"advise":"Funciona mi prro "})
     except ldap.INVALID_CREDENTIALS:
-        db.close()
-        cursor.close()
+        #db.close()
+        #cursor.close()
         return jsonify({"advise":"invalid credentials"})
     except ldap.SERVER_DOWN:
-        db.close()
-        cursor.close()
+        #db.close()
+        #cursor.close()
         return jsonify({"advise":"Server down"})
 
 def ldapAuthConn(user_email,user_password):
-    db = getMysqlConnection()
-    cursor = db.cursor()
+    #db = getMysqlConnection()
+    #cursor = db.cursor()
     email = user_email
     password = user_password
 
@@ -252,16 +252,16 @@ def ldapAuthConn(user_email,user_password):
         user_dn = "cn="+email+",dc=arqsoft,dc=unal,dc=edu,dc=co"
         user_password = password
         con.simple_bind_s(user_dn,user_password)
-        db.close()
-        cursor.close()
+        #db.close()
+        #cursor.close()
         return "true"
     except ldap.INVALID_CREDENTIALS:
-        db.close()
-        cursor.close()
+        #db.close()
+        #cursor.close()
         return "invalid credentials on ldap"
     except ldap.SERVER_DOWN:
-        db.close()
-        cursor.close()
+        #db.close()
+        #cursor.close()
         return "Ldap server down"
 
 

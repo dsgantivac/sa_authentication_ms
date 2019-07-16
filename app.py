@@ -161,8 +161,8 @@ def sessionStart():
     password = content['password']
     ldapAns = ldapAuthConn(email,password)
     if ldapAns != "true":
-        db.close()
-        cursor.close()
+        #db.close()
+        #cursor.close()
         return jsonify({"advise":ldapAns})
 
     mobil = content['mobil']
@@ -174,8 +174,8 @@ def sessionStart():
         #cursor.close()
         return jsonify(data)
     else:
-        db.close()
-        cursor.close()
+        #db.close()
+        #cursor.close()
         return jsonify({"advise":"bad email or password"})
 
 @app.route('/Session', methods = ['DELETE'])
